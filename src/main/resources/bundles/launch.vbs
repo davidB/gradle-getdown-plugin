@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "java -jar ./app/getdown*.jar ./app", 0, False

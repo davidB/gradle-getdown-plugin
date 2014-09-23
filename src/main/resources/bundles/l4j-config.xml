@@ -1,0 +1,43 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>${outfile}</outfile>
+  <jar>${jar}</jar>
+  <dontWrapJar>true</dontWrapJar>
+  <errTitle>${title} - launcher</errTitle>
+  <icon>${icon}</icon>
+  <chdir>.</chdir>
+  <customProcName>true</customProcName>
+  <singleInstance>
+    <mutexName>${title}</mutexName>
+    <windowTitle>${title}</windowTitle>
+  </singleInstance>
+  <jre>
+    <!-- Specify one of the following or both -->
+    <path>jre</path>
+    <minVersion>1.5.0</minVersion>
+  </jre>
+  <!--splash>
+    <file>file</file>
+    <waitForWindow>true|false</waitForWindow>
+    <timeout>seconds [60]</timeout>
+    <timeoutErr>true|false</timeoutErr>
+  </splash-->
+  <!--versionInfo>
+    <fileVersion>x.x.x.x</fileVersion>
+    <txtFileVersion>text</txtFileVersion>
+    <fileDescription>text</fileDescription>
+    <copyright>text</copyright>
+    <productVersion>x.x.x.x</productVersion>
+    <txtProductVersion>text</txtProductVersion>
+    <productName>text</productName>
+    <companyName>text</companyName>
+    <internalName>filename</internalName>
+    <originalFilename>filename.exe</originalFilename>
+  </versionInfo-->
+  <!--messages>
+    <startupErr>text</startupErr>
+    <bundledJreErr>text</bundledJreErr>
+    <jreVersionErr>text</jreVersionErr>
+    <launcherErr>text</launcherErr>
+  </messages-->
+</launch4jConfig>

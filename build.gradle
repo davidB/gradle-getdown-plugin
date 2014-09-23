@@ -1,0 +1,60 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+	}
+}
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'eclipse'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+}
+
+version = "0.1.0"
+group = "com.github.davidb"
+
+bintray {
+	user = bintray_user
+	key = bintray_api_key
+
+	publications = ['mavenStuff'] //When uploading Maven-based publication files
+	dryRun = false //Whether to run this as dry-run, without deploying
+	publish = true //If version should be auto published after an upload
+	pkg {
+		repo = 'maven'
+		name = project.name
+		desc = 'A gradle plugin to bundle java app + jre with getdown support'
+		websiteUrl = "https://github.com/davidB/${project.name}"
+		issueTrackerUrl = "https://github.com/davidB/${project.name}/issues"
+		vcsUrl = "https://github.com/davidB/${project.name}.git"
+		licenses = ['CC0']
+		labels = ['gradle', 'getdown', 'bundle', 'package']
+		publicDownloadNumbers = true
+		//attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+		//Optional version descriptor
+		/*
+		version {
+			name = '1.3-Final' //Bintray logical version name
+			desc = 'optional, version-specific description'
+			released  = 'optional, date of the version release' //2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
+			vcsTag = '1.3.0'
+			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
+			gpg {
+				sign = true //Determines whether to GPG sign the files. The default is false
+				passphrase = 'optional, the passphrase for GPG signing'
+			}
+		}
+		*/
+	}
+}

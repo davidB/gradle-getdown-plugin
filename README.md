@@ -64,7 +64,7 @@ build/getdown
 └── launch.exe
 ```
 
-This result can be upload to the getdown’s :
+This result can be upload to the urlbase :
 
 * user can download bundles to run the app, it should not require additionnal download if up-to-date
 * previous user will be updated
@@ -78,7 +78,7 @@ A sample application can be browse at https://github.com/davidB/jme3_skel
 
 # Configurations
 
-see [GetdownPluginExtension](src/main/groovy/GetdownPluginExtension.groovy)
+see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groovy)
 
 ```
 	/** application title, used for display name (default : project.name)*/

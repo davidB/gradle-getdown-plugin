@@ -15,4 +15,4 @@ jvmarg = -Dappdir=%APPDIR%
 ${cfg.jvmArgs.inject('') { acc, val ->  acc + '\njvmarg=' + val}}
 
 java_min_version = ${JreTools.toGetdownFormat(cfg.jreVersion)}
-${cfg.platforms.inject('') {acc, val -> acc + '\njava_location= [' + val.system + '] jres/' + JreTools.findJreJarName(cfg.jreVersion, val)}}
+${cfg.platforms.inject('') {acc, val -> acc + '\njava_location= [' + val.system + '] ../jres/' + JreTools.findJreJarName(cfg.jreVersion, val)}}

@@ -182,7 +182,7 @@ class GetdownPlugin implements Plugin<Project> {
 						}
 					}
 				}
-				if (platform.system.indexOf("windows") < 0) {
+				if (platform.durl.indexOf("windows") < 0) {
 					project.task(type: Tar, "${taskBundleName}_${platform.durl}") {
 						description = "bundle the application into .tgz with jre for ${platform.durl}"
 						group GROUP

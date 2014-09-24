@@ -7,6 +7,7 @@ buildscript {
 	}
 }
 apply plugin: 'eclipse'
+apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
@@ -22,7 +23,7 @@ dependencies {
 }
 
 group = "net.alchim31.gradle"
-version = "0.2.0"
+version = "0.2.1"
 def description = 'A gradle plugin to bundle java app + jre with getdown support'
 
 compileGroovy {

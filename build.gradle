@@ -6,55 +6,91 @@ buildscript {
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
 	}
 }
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'eclipse'
 apply plugin: 'groovy'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 repositories {
-  mavenCentral()
+	jcenter()
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
-    compile 'com.squareup.okhttp:okhttp:2.0.0'
+	compile gradleApi()
+	compile localGroovy()
+	compile 'com.squareup.okhttp:okhttp:2.0.0' // compiled with jdk 1.7
 }
 
-version = "0.1.0"
-group = "com.github.davidb"
+group = "net.alchim31.gradle"
+version = "0.1.1"
+def description = 'A gradle plugin to bundle java app + jre with getdown support'
+
+compileGroovy {
+	sourceCompatibility = '1.7'
+	targetCompatibility = '1.7'
+}
+
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+	//jar.dependsOn sourcesJar
+
+def pomConfig = {
+	licenses {
+		license {
+			name "Public domain (CC0-1.0)"
+			url "http://creativecommons.org/publicdomain/zero/1.0/"
+			distribution "repo"
+		}
+	}
+	developers {
+		developer {
+			id "davidB"
+			name "David Bernard"
+		}
+	}
+}
+
+publishing {
+	publications {
+		mavenStuff(MavenPublication) {
+			from components.java
+			artifact sourcesJar
+			pom.withXml {
+				def root = asNode()
+				root.appendNode('description', description)
+				root.children().last() + pomConfig
+			}
+		}
+	}
+}
 
 bintray {
 	user = bintray_user
 	key = bintray_api_key
 
 	publications = ['mavenStuff'] //When uploading Maven-based publication files
-	dryRun = false //Whether to run this as dry-run, without deploying
+	//dryRun = false //Whether to run this as dry-run, without deploying
 	publish = true //If version should be auto published after an upload
 	pkg {
 		repo = 'maven'
 		name = project.name
-		desc = 'A gradle plugin to bundle java app + jre with getdown support'
+		desc = description
 		websiteUrl = "https://github.com/davidB/${project.name}"
 		issueTrackerUrl = "https://github.com/davidB/${project.name}/issues"
 		vcsUrl = "https://github.com/davidB/${project.name}.git"
-		licenses = ['CC0']
+		licenses = ['CC0-1.0']
 		labels = ['gradle', 'getdown', 'bundle', 'package']
 		publicDownloadNumbers = true
-		//attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
-		//Optional version descriptor
-		/*
 		version {
-			name = '1.3-Final' //Bintray logical version name
-			desc = 'optional, version-specific description'
-			released  = 'optional, date of the version release' //2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
-			vcsTag = '1.3.0'
-			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
-			gpg {
-				sign = true //Determines whether to GPG sign the files. The default is false
-				passphrase = 'optional, the passphrase for GPG signing'
-			}
+			name = project.version
+			vcsTag = project.version
+			attributes = ['gradle-plugin': "net.alchim31.gradle.getdown:net.alchim31.gradle:${project.name}"] //Optional version-level attributes
+			//gpg {
+			//	sign = true //Determines whether to GPG sign the files. The default is false
+			//	passphrase = 'optional, the passphrase for GPG signing'
+			//}
 		}
-		*/
 	}
 }

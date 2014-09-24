@@ -23,15 +23,9 @@ class GetdownPlugin implements Plugin<Project> {
 		project.plugins.apply(JavaPlugin)
 		project.configurations {
 			getdown
-			launch4j
 		}
 		project.dependencies {
 			getdown 'com.threerings:getdown:1.3.1'
-			launch4j('net.sf.launch4j:launch4j:3.4.0'){
-				exclude group: 'net.java.abeille'
-				exclude group: 'com.jgoodies'
-				exclude group: 'org.apache.ant'
-			}
 		}
 		def cfg = project.extensions.create("getdown", GetdownPluginExtension)
 		cfg.title = project.name
@@ -113,11 +107,6 @@ class GetdownPlugin implements Plugin<Project> {
 						def f = project.file("${cfg.dest}-tmp/l4j-config.xml")
 						f.getParentFile().mkdirs()
 						f.write(str)
-		//				ant.taskdef(name: 'launch4j'
-		//					,classname: 'net.sf.launch4j.ant.Launch4jTask'
-		//					,classpath: project.configurations.launch4j.asPath
-		//				)
-		//				ant.launch4j(configFile : f)
 		 				def task = project.tasks.create("launch4jRun", Exec)
 						task.description = "Runs launch4j to generate an .exe file"
 						task.group = GROUP

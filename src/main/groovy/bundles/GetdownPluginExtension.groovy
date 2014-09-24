@@ -7,8 +7,8 @@ class GetdownPluginExtension {
 	/** application title, used for display name (default : project.name)*/
 	String title
 
-	/** url of getdown's appbase */
-	String appbase
+	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/${version})*/
+	String urlbase
 
 	/** getdown version (default : 'app')*/
 	String version

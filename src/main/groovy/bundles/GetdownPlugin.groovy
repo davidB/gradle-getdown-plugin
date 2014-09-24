@@ -31,11 +31,11 @@ class GetdownPlugin implements Plugin<Project> {
 		cfg.title = project.name
 		cfg.version = "app"
 		cfg.dest = project.file("${project.buildDir}/getdown")
-		cfg.destVersion = project.file("${cfg.dest}/${cfg.version}")
-		cfg.tmplGetdownTxt = configureTmplGetdownTxt()
-		cfg.tmplScriptUnix = configureTmplScriptUnix()
-		cfg.tmplLaunch4j = configureTmplLaunch4j()
-		cfg.tmplScriptWindows = configureTmplWindowsUnix()
+		cfg.destVersion = new File(cfg.dest, cfg.version)
+		cfg.tmplGetdownTxt = read("bundles/getdown.txt")
+		cfg.tmplScriptUnix = read("bundles/launch")
+		cfg.tmplLaunch4j = read("bundles/l4j-config.xml")
+		cfg.tmplScriptWindows = read("bundles/launch.vbs")
 		cfg.launch4jCmd = engine.createTemplate(System.properties['launch4jCmd']).make(['System' : System]).toString()
 		cfg.jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
 		//cfg.launch4jCmd = System.properties['launch4jCmd']
@@ -52,7 +52,7 @@ class GetdownPlugin implements Plugin<Project> {
 				description = 'create the file getdown.txt'
 				group GROUP
 				doLast {
-					def f = project.file("${cfg.destVersion}/getdown.txt")
+					def f = new File(cfg.destVersion, "getdown.txt")
 					def binding = ["project": project, "cfg": cfg, "JreTools": JreTools]
 					def str = engine.createTemplate(cfg.tmplGetdownTxt).make(binding).toString()
 					f.write(str)
@@ -80,7 +80,7 @@ class GetdownPlugin implements Plugin<Project> {
 				description = "create the launcher script for unix (linux)"
 				group GROUP
 				doLast {
-					def f = project.file("${cfg.dest}/launch")
+					def f = new File(cfg.dest, "launch")
 					def str = cfg.tmplScriptUnix.toString()
 					f.write(str)
 					ant.chmod(file: f, perm: "ugo+rx")
@@ -91,8 +91,8 @@ class GetdownPlugin implements Plugin<Project> {
 				group GROUP
 				doLast {
 					if (cfg.launch4jCmd == null) {
-						println("no launch4jCmd defined, then use tmplScriptWindows")
-						def f = project.file("${cfg.dest}/launch.vbs")
+						logger.info("no launch4jCmd defined, then use tmplScriptWindows")
+						def f = new File(cfg.dest, "launch.vbs")
 						def str = cfg.tmplScriptWindows.toString()
 						f.write(str)
 					} else {
@@ -136,7 +136,7 @@ class GetdownPlugin implements Plugin<Project> {
 				dependsOn project.copyDist, project.makeGetdownTxt, project.makeDigest, project.makeLaunchers
 			}
 			def taskBundleName = "bundle"
-			def bundlesDir = project.file("${cfg.dest}/bundles")
+			def bundlesDir = new File(cfg.dest, "bundles")
 			project.task(type: Tar, "${taskBundleName}_0") {
 				description = "bundle the application into .tgz without jre"
 				group GROUP
@@ -243,41 +243,7 @@ class GetdownPlugin implements Plugin<Project> {
 		distSpec
 	}
 
-	String configureTmplGetdownTxt() {
-'''
-# The URL from which the client is downloaded
-appbase = ${cfg.appbase}
-
-# UI Configuration
-ui.name = ${cfg.title}
-
-# Application jar files
-${project.fileTree(dir: cfg.destVersion+'/lib').getFiles().inject('') { acc, val ->  acc + '\\ncode = lib/' + val.getName()}}
-
-# The main entry point for the application
-class = ${cfg.mainClassName}
-
-allow_offline = true
-
-jvmarg = -Djava.library.path=%APPDIR%/native
-jvmarg = -Dappdir=%APPDIR%
-${cfg.jvmArgs.inject('') { acc, val ->  acc + '\\njvmarg=' + val}}
-
-java_min_version = ${JreTools.toGetdownFormat(cfg.jreVersion)}
-${cfg.platforms.inject('') {acc, val -> acc + '\\njava_location= [' + val.system + '] jres/' + JreTools.findJreJarName(cfg.jreVersion, val)}}
-
-'''
-	}
-
-	String configureTmplScriptUnix() {
-		return this.getClass().getResourceAsStream("launch").text
-	}
-
-	String configureTmplWindowsUnix() {
-		return this.getClass().getResourceAsStream("launch.vbs").text
-	}
-
-	String configureTmplLaunch4j() {
-		return this.getClass().getResourceAsStream("l4j-config.xml").text
+	String read(String rsrc) {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
 	}
 }

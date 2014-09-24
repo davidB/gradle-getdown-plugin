@@ -25,6 +25,7 @@ class GetJreTask extends DefaultTask {
 		jres.addAll(platforms.collect {
 			File cache = cachePath(it)
 			if (!cache.exists()) {
+				logger.info("creating : " + cache);
 				File tmp = new File(cache.toString() + ".tmp")
 				tmp.mkdirs()
 				File jreDir = new File(tmp, JreTools.findJreDirNameInJar(version))
@@ -32,7 +33,7 @@ class GetJreTask extends DefaultTask {
 					File downloaded = new File(tmp, "jre.tar.gz")
 					if (!downloaded.exists()) {
 						URL src = JreTools.toOracleDownloadUrl(version, it)
-						println("get : " + src);
+						logger.info("download : " + src);
 						JreTools.downloadJre(src, downloaded)
 					}
 					ant.untar(src: downloaded, compression : 'gzip', dest: tmp)

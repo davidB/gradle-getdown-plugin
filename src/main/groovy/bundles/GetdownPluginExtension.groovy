@@ -3,28 +3,54 @@ package bundles
 import org.gradle.api.file.CopySpec
 
 class GetdownPluginExtension {
-	//String arg0 = project.name
-	//TODO store a hashtable (pre-configured) that will be used as source to generate getdown.txt
 
+	/** application title, used for display name (default : project.name)*/
 	String title
-	String appbase
-	String version
-	String dest
-	String destVersion
-	String tmplGetdownTxt
-	String tmplScriptUnix
-	String tmplScriptWindows
-	String tmplLaunch4j
-	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)
-	Platform[] platforms = Platform.values()
-	File jreCacheDir
 
-	String launch4jCmd
+	/** url of getdown's appbase */
+	String appbase
+
+	/** getdown version (default : 'app')*/
+	String version
+
+	/** directory where to generate getdown 'website' (default : "${project.buildDir}/getdown") */
+	File dest
+
+	/** directory where to place the application (default : "${cfg.dest}/${cfg.version}") */
+	File destVersion
+
+	//TODO store a hashtable (pre-configured) that will be used as source to generate getdown.txt
+	/** The template used to generate getdown.txt */
+	String tmplGetdownTxt
+
+	/** The template used to generate launch (unix launcher script) */
+	String tmplScriptUnix
+
+	/** The template used to generate launch.vbs (windows launcher script if launch4j not available) */
+	String tmplScriptWindows
+
+	/** The template used to generate the launch4j configuration */
+	String tmplLaunch4j
 
 	/**
-	* The name of the application.
-	*/
-	String applicationName
+	 *  The path to the launch4j executable.
+	 *
+	 *  It can be set via system property 'launch4jCmd' or in ~/.gradle/gradle.properties
+	 *  <pre>
+	 *  systemProp.launch4jCmd=${System.properties['user.home']}/bin/soft/launch4j/launch4j
+	 *  </pre>
+	 */
+	String launch4jCmd
+
+	/** jre version to deploy, also used by default getdown.txt template to define the jvm min version */
+	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)
+
+	/** the list of platform for jres and native bundles to provide */
+	Platform[] platforms = Platform.values()
+
+	/** the directory where to cache downloaded + packaged jre (default $HOME/.cache */
+	File jreCacheDir
+
 
 	/**
 	* The fully qualified name of the application's main class.
@@ -40,17 +66,6 @@ class GetdownPluginExtension {
 	* <p>The specification of the contents of the distribution.</p>
 	* <p>
 	* Use this {@link org.gradle.api.file.CopySpec} to include extra files/resource in the application distribution.
-	* <pre autoTested=''>
-	* apply plugin: 'application'
-	*
-	* applicationDistribution.from("some/dir") {
-	* include "*.txt"
-	* }
-	* </pre>
-	* <p>
-	* Note that the application plugin pre configures this spec to; include the contents of "{@code src/dist}",
-	* copy the application start scripts into the "{@code bin}" directory, and copy the built jar and its dependencies
-	* into the "{@code lib}" directory.
 	*/
 	CopySpec distSpec
 }

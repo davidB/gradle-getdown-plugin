@@ -1,7 +1,7 @@
 package bundles
 
 public class JreVersion implements java.io.Serializable{
-	public static long serialVersionUID = 0L
+	public static final long serialVersionUID = 0L
 
 	final int major
 	final int minor

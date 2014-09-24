@@ -7,7 +7,7 @@ public enum Platform implements java.io.Serializable {
 	, LINUX_X64('linux-i386', 'linux-x64')
 	, LINUX_I586('linux-x86_64', 'linux-i586')
 
-	public static long serialVersionUID = 0L
+	public static final long serialVersionUID = 0L
 
 	public final String system
 	public final String durl

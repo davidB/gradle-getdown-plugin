@@ -22,7 +22,7 @@ dependencies {
 }
 
 group = "net.alchim31.gradle"
-version = "0.1.1"
+version = "0.1.2"
 def description = 'A gradle plugin to bundle java app + jre with getdown support'
 
 compileGroovy {
@@ -86,7 +86,7 @@ bintray {
 		version {
 			name = project.version
 			vcsTag = project.version
-			attributes = ['gradle-plugin': "net.alchim31.gradle.getdown:net.alchim31.gradle:${project.name}"] //Optional version-level attributes
+			attributes = ['gradle-plugin': "net.alchim31.getdown:${project.group}:${project.name}"] //Optional version-level attributes
 			//gpg {
 			//	sign = true //Determines whether to GPG sign the files. The default is false
 			//	passphrase = 'optional, the passphrase for GPG signing'

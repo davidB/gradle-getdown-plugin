@@ -23,7 +23,7 @@ dependencies {
 }
 
 group = "net.alchim31.gradle"
-version = "0.2.1"
+version = "0.2.2"
 def description = 'A gradle plugin to bundle java app + jre with getdown support'
 
 compileGroovy {

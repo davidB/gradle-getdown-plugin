@@ -34,11 +34,14 @@ class GetdownPlugin implements Plugin<Project> {
 		cfg.destVersion = new File(cfg.dest, cfg.version)
 		cfg.tmplGetdownTxt = read("bundles/getdown.txt")
 		cfg.tmplScriptUnix = read("bundles/launch")
-		cfg.tmplLaunch4j = read("bundles/l4j-config.xml")
+		cfg.tmplLaunch4j = read("bundles/launch4j-config.xml")
 		cfg.tmplScriptWindows = read("bundles/launch.vbs")
-		cfg.launch4jCmd = engine.createTemplate(System.properties['launch4jCmd']).make(['System' : System]).toString()
+		String v = System.properties['launch4jCmd']
+		if (v != null) {
+			cfg.launch4jCmd = engine.createTemplate(v).make(['System' : System]).toString()
+			//cfg.launch4jCmd = System.properties['launch4jCmd']
+		}
 		cfg.jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
-		//cfg.launch4jCmd = System.properties['launch4jCmd']
 		project.afterEvaluate {
 			project.task(type: JavaExec, 'run') {
 				description = "Runs this project as a JVM application"
@@ -48,6 +51,31 @@ class GetdownPlugin implements Plugin<Project> {
 				jvmArgs cfg.jvmArgs
 				main cfg.mainClassName
 			}
+			cfg.platforms.collect { platform ->
+				//see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
+				project.task(type: GetJreTask, "getJre_${platform.durl}") {
+					description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for platform ${platform.durl}"
+					group GROUP
+					platforms = [platform]
+					dir = cfg.jreCacheDir
+					version = cfg.jreVersion
+				}
+			}
+			//see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
+			project.task(type: GetJreTask, "getJres") {
+				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for all platforms"
+				group GROUP
+				platforms = cfg.platforms
+				dir = cfg.jreCacheDir
+				version = cfg.jreVersion
+			}
+//			project.task('getJres') {
+//				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for all platforms"
+//				group GROUP
+//				dependsOn {
+//					cfg.platforms.collect {platform -> "getJre_${platform.durl}" }
+//				}
+//			}
 			project.task('makeGetdownTxt') {
 				description = 'create the file getdown.txt'
 				group GROUP
@@ -67,15 +95,6 @@ class GetdownPlugin implements Plugin<Project> {
 				main 'com.threerings.getdown.tools.Digester'
 				args '.'
 			}
-
-			//see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
-			project.task(type: GetJreTask, 'getJres') {
-				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir})"
-				group GROUP
-				platforms = cfg.platforms
-				dir = cfg.jreCacheDir
-				version = cfg.jreVersion
-			}
 			project.task('makeLauncherUnix') {
 				description = "create the launcher script for unix (linux)"
 				group GROUP
@@ -86,33 +105,36 @@ class GetdownPlugin implements Plugin<Project> {
 					ant.chmod(file: f, perm: "ugo+rx")
 				}
 			}
-			project.task('makeLauncherWindows') {
-				description = "create the launcher for windows (used launch4j if launch4jCmd is defined else WIP"
-				group GROUP
-				doLast {
-					if (cfg.launch4jCmd == null) {
+			if (cfg.launch4jCmd != null && cfg.launch4jCmd.trim().length() > 0 ) {
+				project.task(type: Exec, 'makeLauncherWindows') {
+					description = "create the launcher for windows (via launch4j to generate an .exe file)"
+					group = GROUP
+					commandLine new File(cfg.launch4jCmd).getCanonicalPath(), project.file("${cfg.dest}-tmp/launch4j-config.xml")
+					workingDir cfg.dest
+					doFirst {
+						def getdownJar = project.configurations.getdown.resolve().iterator().next().getName()
+						def binding = ["project": project, "cfg": cfg
+							, 'outfile' : new File(cfg.dest, "launch.exe").getCanonicalPath()
+							, jar : "${cfg.version}/${getdownJar}"
+							, title: cfg.title
+							, icon : new File(cfg.destVersion, "favicon.ico").getCanonicalPath()
+						]
+						def str = engine.createTemplate(cfg.tmplLaunch4j).make(binding).toString()
+						def f = project.file("${cfg.dest}-tmp/launch4j-config.xml")
+						f.getParentFile().mkdirs()
+						f.write(str)
+						cfg.dest.mkdirs()
+					}
+				}
+			} else {
+				project.task('makeLauncherWindows') {
+					description = "create the launcher for windows (create a VBS script)"
+					group GROUP
+					doLast {
 						logger.info("no launch4jCmd defined, then use tmplScriptWindows")
 						def f = new File(cfg.dest, "launch.vbs")
 						def str = cfg.tmplScriptWindows.toString()
 						f.write(str)
-					} else {
-						def getdownJar = project.configurations.getdown.resolve().iterator().next().getName()
-						def binding = ["project": project, "cfg": cfg
-						, 'outfile' : "${cfg.dest}/launch.exe"
-						, jar : "${cfg.version}/${getdownJar}"
-						, title: cfg.title
-						, icon : "${cfg.destVersion}/favicon.ico"
-						]
-						def str = engine.createTemplate(cfg.tmplLaunch4j).make(binding).toString()
-						def f = project.file("${cfg.dest}-tmp/l4j-config.xml")
-						f.getParentFile().mkdirs()
-						f.write(str)
-		 				def task = project.tasks.create("launch4jRun", Exec)
-						task.description = "Runs launch4j to generate an .exe file"
-						task.group = GROUP
-						task.commandLine "${cfg.launch4jCmd}", f
-						task.workingDir cfg.dest
-						task.execute()
 					}
 				}
 			}
@@ -151,8 +173,7 @@ class GetdownPlugin implements Plugin<Project> {
 					}
 				}
 			}
-			cfg.platforms.collect {
-				def platform = it
+			cfg.platforms.collect { platform ->
 				//def jreArchive = project.file("${cfg.dest}/jres/${JreTools.findJreJarName(cfg.jreVersion, platform)}")
 				def jreArchive = project.getJres.cachePath(platform)
 				def bundleSpec = project.copySpec {
@@ -186,7 +207,7 @@ class GetdownPlugin implements Plugin<Project> {
 					project.task(type: Tar, "${taskBundleName}_${platform.durl}") {
 						description = "bundle the application into .tgz with jre for ${platform.durl}"
 						group GROUP
-						dependsOn  project.getJres, project.assembleApp
+						dependsOn "getJre_${platform.durl}", project.assembleApp
 						compression = 'gzip'
 						destinationDir = bundlesDir
 						version = cfg.version
@@ -197,7 +218,7 @@ class GetdownPlugin implements Plugin<Project> {
 					project.task(type: Zip, "${taskBundleName}_${platform.durl}") {
 						description = "bundle the application into .zip with jre for ${platform.durl}"
 						group GROUP
-						dependsOn project.getJres, project.assembleApp
+						dependsOn "getJre_${platform.durl}", project.assembleApp
 						destinationDir = bundlesDir
 						version = cfg.version
 						classifier = platform.durl
@@ -225,7 +246,8 @@ class GetdownPlugin implements Plugin<Project> {
 
 	CopySpec configureDistSpec(project, version) {
 		def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-		def jres = project.tasks['getJres']
+		//def jres = project.tasks.findAll{it.name.startsWith('getJre_')}.collect{it.jres}.flatten
+		def jres = project.tasks['getJres'].jres
 		def distSpec = project.copySpec {}
 		distSpec.with {
 			into(version){
@@ -237,7 +259,7 @@ class GetdownPlugin implements Plugin<Project> {
 				}
 			}
 			into("jres") {
-				from(jres.jres)
+				from(jres)
 			}
 		}
 		distSpec

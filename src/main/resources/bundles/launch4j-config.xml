@@ -5,6 +5,7 @@
   <dontWrapJar>true</dontWrapJar>
   <errTitle>${title} - launcher</errTitle>
   <icon>${icon}</icon>
+  <cmdLine>./app</cmdLine>
   <chdir>.</chdir>
   <customProcName>true</customProcName>
   <singleInstance>
@@ -14,7 +15,7 @@
   <jre>
     <!-- Specify one of the following or both -->
     <path>jre</path>
-    <minVersion>1.5.0</minVersion>
+    <minVersion>1.7.0</minVersion>
   </jre>
   <!--splash>
     <file>file</file>

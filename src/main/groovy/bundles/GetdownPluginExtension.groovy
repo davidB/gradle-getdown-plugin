@@ -29,18 +29,21 @@ class GetdownPluginExtension {
 	/** The template used to generate launch.vbs (windows launcher script if launch4j not available) */
 	String tmplScriptWindows
 
-	/** The template used to generate the launch4j configuration */
-	String tmplLaunch4j
-
 	/**
 	 *  The path to the launch4j executable.
 	 *
 	 *  It can be set via system property 'launch4jCmd' or in ~/.gradle/gradle.properties
 	 *  <pre>
+	 *  # for linux
 	 *  systemProp.launch4jCmd=${System.properties['user.home']}/bin/soft/launch4j/launch4j
+	 *  # for windows (in your path use '/' or '\\\\'  ( 4x '\' ), but not single '\' )
+	 *  systemProp.launch4jCmd=c:/soft/launch4j/launch4j.exe
 	 *  </pre>
 	 */
 	String launch4jCmd
+
+	/** The template used to generate the launch4j configuration */
+	String tmplLaunch4j
 
 	/** jre version to deploy, also used by default getdown.txt template to define the jvm min version */
 	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)

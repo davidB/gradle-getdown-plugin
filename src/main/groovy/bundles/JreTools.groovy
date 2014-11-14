@@ -30,7 +30,7 @@ public class JreTools {
 	}
 
 	public static def findJreDirNameInTar(JreVersion jv) {
-		"jre${jv.major}.${jv.minor}.${jv.micro}_${jv.update}"
+		"jre${jv.major}.${jv.minor}.${jv.micro}_${String.format("%02d", jv.update)}"
 	}
 
 	public static def findJreDirNameInJar(JreVersion jv) {

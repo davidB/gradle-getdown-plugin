@@ -1,4 +1,5 @@
-A gradle plugin to bundle java app + jre with getdown support
+A gradle plugin to bundle java app + jre with getdown support.
+The plugin is **incompatible with the 'application plugin'**. 
 
 NOTE: *it's my first groovy project and my first gradle plugin, so any advices are welcome*
 
@@ -84,8 +85,8 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	/** application title, used for display name (default : project.name)*/
 	String title
 
-	/** url of getdown's appbase */
-	String appbase
+	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/${version})*/
+	String urlbase
 
 	/** getdown version (default : 'app')*/
 	String version
@@ -106,18 +107,21 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	/** The template used to generate launch.vbs (windows launcher script if launch4j not available) */
 	String tmplScriptWindows
 
-	/** The template used to generate the launch4j configuration */
-	String tmplLaunch4j
-
 	/**
 	 *  The path to the launch4j executable.
 	 *
 	 *  It can be set via system property 'launch4jCmd' or in ~/.gradle/gradle.properties
 	 *  <pre>
+	 *  # for linux
 	 *  systemProp.launch4jCmd=${System.properties['user.home']}/bin/soft/launch4j/launch4j
+	 *  # for windows (in your path use '/' or '\\\\'  ( 4x '\' ), but not single '\' )
+	 *  systemProp.launch4jCmd=c:/soft/launch4j/launch4j.exe
 	 *  </pre>
 	 */
 	String launch4jCmd
+
+	/** The template used to generate the launch4j configuration */
+	String tmplLaunch4j
 
 	/** jre version to deploy, also used by default getdown.txt template to define the jvm min version */
 	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)
@@ -145,8 +149,42 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	* Use this {@link org.gradle.api.file.CopySpec} to include extra files/resource in the application distribution.
 	*/
 	CopySpec distSpec
-}
+
 ```
+
+# Tasks
+
+Every steps can be called via a task, to ease setup/debugging
+
+````
+$> gradle tasks
+
+...
+                                                                                                                                                
+Getdown-bundles tasks                                                                                                                           
+---------------------                                                                                                                           
+assembleApp - assemble the full app (getdown ready) into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown                               
+bundle_0 - bundle the application into .tgz without jre                                                                                         
+bundle_linux-i586 - bundle the application into .tgz with jre for linux-i586                                                                    
+bundle_linux-x64 - bundle the application into .tgz with jre for linux-x64                                                                      
+bundle_windows-i586 - bundle the application into .zip with jre for windows-i586                                                                
+bundle_windows-x64 - bundle the application into .zip with jre for windows-x64                                                                  
+bundles - generate all bundles                                                                                                                  
+copyDist - copy src/dist + jres into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown                                                   
+getJre_linux-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-i586                            
+getJre_linux-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-x64                              
+getJre_windows-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-i586                        
+getJre_windows-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-x64                          
+getJres - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for all platforms                                            
+makeDigest - create the file digest.txt from getdown.txt + files                                                                                
+makeGetdownTxt - create the file getdown.txt                                                                                                    
+makeLauncherUnix - create the launcher script for unix (linux)                                                                                  
+makeLauncherWindows - create the launcher for windows (create a VBS script)                                                                     
+run - Runs this project as a JVM application                                                                                                    
+
+...                                                                                                                                            
+```                                                                                                              
+* **makeLauncherWindows** if launch4jCmd is defined generate a .exe else a .vbs script (description of task also change when launch4jCmd is defined)  
 
 # TODO
 
@@ -157,4 +195,5 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
   * how to configure,...
 * create mac OSX bundle (.app)
 * versionned mode support
+* allow to configure what files to remove from jre + from jre/rt.jar like [packr](https://github.com/libgdx/packr)
 * applet mode support ??

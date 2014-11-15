@@ -18,6 +18,8 @@ class GetdownPlugin implements Plugin<Project> {
 	static final String PLUGIN_NAME = "getdown"
 	static final String GROUP = "getdown-bundles"
 	static final GStringTemplateEngine engine = new GStringTemplateEngine()
+	static final String[] IMG_SHORTCUTS = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png', 'shortcut-256.png', 'shortcut-16@2x.png', 'shortcut-32@2x.png', 'shortcut-128@2x.png']
+	static final String[] IMG_SHORTCUTS_DEFAULT = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png']
 
 	void apply(Project project) {
 		project.plugins.apply(JavaPlugin)
@@ -47,6 +49,7 @@ class GetdownPlugin implements Plugin<Project> {
 			//cfg.launch4jCmd = System.properties['launch4jCmd']
 		}
 		cfg.jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
+		cfg.shortcuts = findShortcuts(project)
 		project.afterEvaluate {
 			project.task(type: JavaExec, 'run') {
 				description = "Runs this project as a JVM application"
@@ -73,6 +76,31 @@ class GetdownPlugin implements Plugin<Project> {
 				platforms = cfg.platforms
 				dir = cfg.jreCacheDir
 				version = cfg.jreVersion
+			}
+			project.task("makeIcons") {
+				description = 'create favicon.ico from shorcut-*.png if favicon.ico is missing'
+				group GROUP
+				doLast {
+					def ico = project.file("${cfg.dest}-tmp/all/favicon.ico")
+					if (project.file("src/dist/favicon.ico").exists()){
+						ico.delete()
+						return
+					}
+					def shortcuts = IMG_SHORTCUTS 
+						.collect{project.file("src/dist/${it}")}
+						.findAll{it != null && it.exists()}
+					if (shortcuts.empty) {
+						shortcuts = IMG_SHORTCUTS_DEFAULT 
+							.collect{project.file("${cfg.dest}-tmp/all/${it}")}
+						if (!shortcuts.first().exists()) {
+							shortcuts.each{extractToFile("dist/all/${it.getName()}", it)}
+						}	
+					} else {
+						//TODO remove existing shortcuts on cfg.dest
+					}
+					//TODO doesn't generate ico if uptodate
+					Helper4Icon.makeIcoFile(ico, shortcuts, logger)
+				}
 			}
 //			project.task('getJres') {
 //				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for all platforms"
@@ -116,6 +144,7 @@ class GetdownPlugin implements Plugin<Project> {
 					group = GROUP
 					commandLine new File(cfg.launch4jCmd).getCanonicalPath(), project.file("${cfg.dest}-tmp/launch4j-config.xml")
 					workingDir cfg.dest
+					//dependsOn project.makeIcons
 					doFirst {
 						def getdownJar = project.configurations.getdown.resolve().iterator().next().getName()
 						def binding = ["project": project, "cfg": cfg
@@ -155,12 +184,12 @@ class GetdownPlugin implements Plugin<Project> {
 				with cfg.distSpec
 				into cfg.dest
 			}
-			project.copyDist.mustRunAfter(project.getJres)
+			project.copyDist.mustRunAfter(project.getJres, project.makeIcons)
 
 			project.task('assembleApp'){
 				description = "assemble the full app (getdown ready) into ${cfg.dest}"
 				group GROUP
-				dependsOn project.copyDist, project.makeGetdownTxt, project.makeDigest, project.makeLaunchers
+				dependsOn project.makeIcons, project.copyDist, project.makeGetdownTxt, project.makeDigest, project.makeLaunchers
 			}
 			def taskBundleName = "bundle"
 			def bundlesDir = new File(cfg.dest, "bundles")
@@ -256,6 +285,7 @@ class GetdownPlugin implements Plugin<Project> {
 		def distSpec = project.copySpec {}
 		distSpec.with {
 			into(version){
+				from(project.file("${project.getdown.dest}-tmp/all")) //${cfg.dest}-tmp
 				from(project.file("src/dist"))
 				from(project.configurations.getdown)
 				into("lib") {
@@ -272,5 +302,17 @@ class GetdownPlugin implements Plugin<Project> {
 
 	String read(String rsrc) {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
+	}
+	
+	def findShortcuts(Project project) {
+		def shortcuts = IMG_SHORTCUTS.findAll{project.file("src/dist/${it}").exists()}
+		(shortcuts.empty) ? IMG_SHORTCUTS_DEFAULT.findAll() : shortcuts
+	}
+	
+	void extractToFile(String rsrc, File dest) {
+		dest.getParentFile().mkdirs()
+		dest.withOutputStream{ os->
+		  os << Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc)
+		}
 	}
 }

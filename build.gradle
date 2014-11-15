@@ -20,6 +20,7 @@ dependencies {
 	compile gradleApi()
 	compile localGroovy()
 	compile 'com.squareup.okhttp:okhttp:2.0.0' // compiled with jdk 1.7
+	compile 'org.jclarion:image4j:0.7'
 }
 
 group = "net.alchim31.gradle"

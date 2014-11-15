@@ -66,6 +66,12 @@ class GetdownPluginExtension {
 	Iterable<String> jvmArgs = []
 
 	/**
+	 * List the available shortcuts image/icons.
+	 * The shortcuts are autodetected (and filled) by presence of src/dist/shortcut-{16,32,64,128,256}.png
+	 */
+	Iterable<String> shortcuts = []
+	
+	/**
 	* <p>The specification of the contents of the distribution.</p>
 	* <p>
 	* Use this {@link org.gradle.api.file.CopySpec} to include extra files/resource in the application distribution.

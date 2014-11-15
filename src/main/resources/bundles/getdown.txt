@@ -3,6 +3,10 @@ appbase = ${cfg.urlbase}/${cfg.version}
 
 # UI Configuration
 ui.name = ${cfg.title}
+${cfg.shortcuts.inject(''){ acc, val -> acc + '\nui.icon = ' + val}}
+
+# Resources for UI
+${cfg.shortcuts.inject(''){ acc, val -> acc + '\nresource = ' + val}}
 
 # Application jar files
 ${project.fileTree(dir: cfg.destVersion.toString() +'/lib').getFiles().inject('') { acc, val ->  acc + '\ncode = lib/' + val.getName()}}

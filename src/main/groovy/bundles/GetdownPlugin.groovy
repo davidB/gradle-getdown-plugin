@@ -28,6 +28,11 @@ class GetdownPlugin implements Plugin<Project> {
 			getdown 'com.threerings:getdown:1.3.1'
 		}
 		def cfg = project.extensions.create("getdown", GetdownPluginExtension)
+		if (project.getPlugins().findPlugin('application') != null) {
+			project.getLogger().warn("the gradle-getdown-plugin is incompatible with 'application' plugin")
+			throw new IllegalStateException("the gradle-getdown-plugin is incompatible with 'application' plugin")
+		}
+		
 		cfg.title = project.name
 		cfg.version = "app"
 		cfg.dest = project.file("${project.buildDir}/getdown")

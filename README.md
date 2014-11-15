@@ -186,6 +186,11 @@ run - Runs this project as a JVM application
 ```                                                                                                              
 * **makeLauncherWindows** if launch4jCmd is defined generate a .exe else a .vbs script (description of task also change when launch4jCmd is defined)  
 
+# Alternatives
+
+* [JavaFX packaging tools](https://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm) + [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/):  This plugin will ultimately provide gradle build tasks for the JavaFX Deployment tools in the Java 7 JDK. see [tutorial](http://jaxenter.com/tutorial-a-guide-to-the-gradle-javafx-plugin-105730.html). JavaFx Deployement Tool is the most complete but it can't create cross platform bundle (only installer), it create bundle only the current platform :-( .
+* [Packr](https://github.com/libgdx/packr/) : Packages your JAR, assets and a JVM for distribution on Windows (ZIP), Linux (ZIP) and Mac OS X (.app), adding a native executable file to make it appear like the app is a native app.
+
 # TODO
 
 * more testing
@@ -197,3 +202,6 @@ run - Runs this project as a JVM application
 * versionned mode support
 * allow to configure what files to remove from jre + from jre/rt.jar like [packr](https://github.com/libgdx/packr)
 * applet mode support ??
+* auto-download + install (in cache) of launch4j like in [launch4j-maven-plugin](https://github.com/lukaszlenart/launch4j-maven-plugin), then user doesn't care if it's launch4j or an other backend-tool used to create .exe for windows.
+* create .ico from png (like [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/), see process in [Automating the creation of multires icons for JavaFX applications](http://teabeeoh.blogspot.fr/2014/02/automating-creation-of-multires-icons.html) ) +may be create every missing resolution from bigger image. 
+

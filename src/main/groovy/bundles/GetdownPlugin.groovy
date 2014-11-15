@@ -25,7 +25,7 @@ class GetdownPlugin implements Plugin<Project> {
 			getdown
 		}
 		project.dependencies {
-			getdown 'com.threerings:getdown:1.3.1'
+			getdown 'com.threerings:getdown:1.4'
 		}
 		def cfg = project.extensions.create("getdown", GetdownPluginExtension)
 		if (project.getPlugins().findPlugin('application') != null) {

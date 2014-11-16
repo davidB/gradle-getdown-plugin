@@ -27,6 +27,8 @@ group = "net.alchim31.gradle"
 version = "0.3.0"
 def description = 'A gradle plugin to bundle java app + jre with getdown support'
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 compileGroovy {
 	sourceCompatibility = '1.7'
 	targetCompatibility = '1.7'

@@ -7,17 +7,19 @@ class GetdownPluginExtension {
 	/** application title, used for display name (default : project.name)*/
 	String title
 
-	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/${version})*/
+	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/%VERSION%)*/
 	String urlbase
 
-	/** getdown version (default : timestamp 'yyyyMMddHHmm' as long)*/
+	/** app version as long (default : timestamp 'yyyyMMddHHmm' as long) should always increase (use by getdown)*/
 	long version
 
 	/**
-	 * if devmode == true, lastest is not include in getdown.txt, so local bundle is not overriden by content of remote http server.
-	 * if devmode == false then 'latest = ${cfg.urlbase}/latest-getdown.txt'
+	 * if checklatest == true
+	 * then 'latest = ${cfg.urlbase}/app/getdown.txt'
+	 * else lastest is not include in getdown.txt, so local bundle is not overriden by content of remote http server.
+	 * (default : false to allow to run local version without need or overwrite from remote server)
 	 */
-	boolean devmode = true
+	boolean checklatest = false
 
 	/** directory where to generate getdown 'website' (default : "${project.buildDir}/getdown") */
 	File dest

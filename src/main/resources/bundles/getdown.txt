@@ -1,7 +1,7 @@
 # The URL from which the client is downloaded
 version = ${cfg.version}
 appbase = ${cfg.urlbase}/%VERSION%
-${cfg.devmode ? 'latest = ' + cfg.urlbase +'/latest-getdown.txt' : ''}
+${cfg.checklatest ? 'latest = ' + cfg.urlbase +'/latest-getdown.txt' : ''}
 
 # UI Configuration
 ui.name = ${cfg.title}
@@ -18,7 +18,7 @@ class = ${cfg.mainClassName}
 
 jvmarg = -Djava.library.path=%APPDIR%/native
 jvmarg = -Dappdir=%APPDIR%
-${cfg.jvmArgs.inject('') { acc, val ->  acc + '\njvmarg=' + val}}
+${cfg.jvmArgs.inject('') { acc, val ->  acc + '\njvmarg = ' + val}}
 
 java_min_version = ${JreTools.toGetdownFormat(cfg.jreVersion)}
 ${cfg.platforms.inject('') {acc, val -> acc + val.systems.inject('') {acc2, val2 -> acc2 + '\njava_location= [' + val2 + '] ../jres/' + JreTools.findJreJarName(cfg.jreVersion, val)}}}

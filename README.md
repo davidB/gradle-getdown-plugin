@@ -53,20 +53,22 @@ build/getdown
 │   └── lib
 |       └── *.jar
 ├── bundles
-│   ├── jme3_skel-app-linux-i586.tgz
-│   ├── jme3_skel-app-linux-x64.tgz
-│   ├── jme3_skel-app-windows-i586.zip
-│   └── jme3_skel-app.tgz
+│   ├── jme3_skel-<bundle_version>-linux-i586.tgz
+│   ├── jme3_skel-<bundle_version>-linux-x64.tgz
+│   ├── jme3_skel-<bundle_version>-windows-i586.zip
+│   └── jme3_skel-<bundle_version>.tgz
 ├── jres
 │   ├── jre-1.8.0.20-linux-i586.jar
 │   ├── jre-1.8.0.20-linux-x64.jar
 │   └── jre-1.8.0.20-windows-i586.jar
+├── latest-getdown.txt
 ├── launch
 └── launch.exe
 ```
 
 This result can be upload to the urlbase :
 
+* **on remote server rename 'app' dir to <bundle_version> long number**
 * user can download bundles to run the app, it should not require additionnal download if up-to-date
 * previous user will be updated
 
@@ -85,17 +87,25 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	/** application title, used for display name (default : project.name)*/
 	String title
 
-	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/${version})*/
+	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/%VERSION%)*/
 	String urlbase
 
-	/** getdown version (default : 'app')*/
-	String version
+	/** app version as long (default : timestamp 'yyyyMMddHHmm' as long) should always increase (use by getdown)*/
+	long version
+
+	/**
+	 * if checklatest == true
+	 * then 'latest = ${cfg.urlbase}/app/getdown.txt'
+	 * else lastest is not include in getdown.txt, so local bundle is not overriden by content of remote http server.
+	 * (default : false to allow to run local version without need or overwrite from remote server)
+	 */
+	boolean checklatest = false
 
 	/** directory where to generate getdown 'website' (default : "${project.buildDir}/getdown") */
 	File dest
 
-	/** directory where to place the application (default : "${cfg.dest}/${cfg.version}") */
-	File destVersion
+	/** directory where to place the application (default : "${cfg.dest}/app") */
+	File destApp
 
 	//TODO store a hashtable (pre-configured) that will be used as source to generate getdown.txt
 	/** The template used to generate getdown.txt */
@@ -142,6 +152,12 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	* Array of string arguments to pass to the JVM when running the application
 	*/
 	Iterable<String> jvmArgs = []
+
+	/**
+	 * List the available shortcuts image/icons.
+	 * The shortcuts are autodetected (and filled) by presence of src/dist/shortcut-{16,32,64,128,256}.png
+	 */
+	Iterable<String> shortcuts = []
 
 	/**
 	* <p>The specification of the contents of the distribution.</p>

@@ -110,7 +110,7 @@ class GetdownPlugin implements Plugin<Project> {
 						ico.delete()
 					} else {
 						//TODO doesn't generate ico if uptodate
-						Helper4Icon.makeIcoFile(ico, shortcuts, logger)
+						Helper4Icon.makeIcoFile(ico, shortcutsF, logger)
 					}
 				}
 			}
@@ -314,6 +314,7 @@ class GetdownPlugin implements Plugin<Project> {
 
 	String read(String rsrc) {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
+		//return this.getClass().getClassLoader().getResourceAsStream("/" + rsrc).text
 	}
 
 	def findShortcuts(Project project) {

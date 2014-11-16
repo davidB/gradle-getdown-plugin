@@ -93,25 +93,25 @@ class GetdownPlugin implements Plugin<Project> {
 				description = 'create favicon.ico from shorcut-*.png if favicon.ico is missing'
 				group GROUP
 				doLast {
-					def ico = project.file("${cfg.dest}-tmp/all/favicon.ico")
-					if (project.file("src/dist/favicon.ico").exists()){
-						ico.delete()
-						return
-					}
-					def shortcuts = IMG_SHORTCUTS
+					def shortcutsF = cfg.shortcuts
 						.collect{project.file("src/dist/${it}")}
 						.findAll{it != null && it.exists()}
-					if (shortcuts.empty) {
-						shortcuts = IMG_SHORTCUTS_DEFAULT
+					if (shortcutsF.empty) {
+						shortcutsF = IMG_SHORTCUTS_DEFAULT
 							.collect{project.file("${cfg.dest}-tmp/all/${it}")}
-						if (!shortcuts.first().exists()) {
-							shortcuts.each{extractToFile("dist/all/${it.getName()}", it)}
+						if (!shortcutsF.first().exists()) {
+							shortcutsF.each{extractToFile("dist/all/${it.getName()}", it)}
 						}
 					} else {
 						//TODO remove existing shortcuts on cfg.dest
 					}
-					//TODO doesn't generate ico if uptodate
-					Helper4Icon.makeIcoFile(ico, shortcuts, logger)
+					def ico = project.file("${cfg.dest}-tmp/all/favicon.ico")
+					if (project.file("src/dist/favicon.ico").exists()){
+						ico.delete()
+					} else {
+						//TODO doesn't generate ico if uptodate
+						Helper4Icon.makeIcoFile(ico, shortcuts, logger)
+					}
 				}
 			}
 			cfg.distSpec = configureDistSpec(project, cfg.version)
@@ -165,7 +165,7 @@ class GetdownPlugin implements Plugin<Project> {
 						def getdownJar = project.configurations.getdown.resolve().iterator().next().getName()
 						def binding = ["project": project, "cfg": cfg
 							, 'outfile' : new File(cfg.dest, "launch.exe").getCanonicalPath()
-							, jar : "${cfg.version}/${getdownJar}"
+							, jar : "app/${getdownJar}"
 							, title: cfg.title
 							, icon : new File(cfg.destApp, "favicon.ico").getCanonicalPath()
 						]

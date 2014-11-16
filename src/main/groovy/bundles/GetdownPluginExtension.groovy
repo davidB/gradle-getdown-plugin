@@ -10,14 +10,20 @@ class GetdownPluginExtension {
 	/** url of the place where content of cfg.dest is deployed (getdown's appbase == ${urlbase}/${version})*/
 	String urlbase
 
-	/** getdown version (default : 'app')*/
-	String version
+	/** getdown version (default : timestamp 'yyyyMMddHHmm' as long)*/
+	long version
+
+	/**
+	 * if devmode == true, lastest is not include in getdown.txt, so local bundle is not overriden by content of remote http server.
+	 * if devmode == false then 'latest = ${cfg.urlbase}/latest-getdown.txt'
+	 */
+	boolean devmode = true
 
 	/** directory where to generate getdown 'website' (default : "${project.buildDir}/getdown") */
 	File dest
 
-	/** directory where to place the application (default : "${cfg.dest}/${cfg.version}") */
-	File destVersion
+	/** directory where to place the application (default : "${cfg.dest}/app") */
+	File destApp
 
 	//TODO store a hashtable (pre-configured) that will be used as source to generate getdown.txt
 	/** The template used to generate getdown.txt */
@@ -70,7 +76,7 @@ class GetdownPluginExtension {
 	 * The shortcuts are autodetected (and filled) by presence of src/dist/shortcut-{16,32,64,128,256}.png
 	 */
 	Iterable<String> shortcuts = []
-	
+
 	/**
 	* <p>The specification of the contents of the distribution.</p>
 	* <p>

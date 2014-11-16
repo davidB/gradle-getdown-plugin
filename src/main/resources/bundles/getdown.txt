@@ -1,5 +1,7 @@
 # The URL from which the client is downloaded
-appbase = ${cfg.urlbase}/${cfg.version}
+version = ${cfg.version}
+appbase = ${cfg.urlbase}/%VERSION%
+${cfg.devmode ? 'latest = ' + cfg.urlbase +'/latest-getdown.txt' : ''}
 
 # UI Configuration
 ui.name = ${cfg.title}
@@ -9,7 +11,7 @@ ${cfg.shortcuts.inject(''){ acc, val -> acc + '\nui.icon = ' + val}}
 ${cfg.shortcuts.inject(''){ acc, val -> acc + '\nresource = ' + val}}
 
 # Application jar files
-${project.fileTree(dir: cfg.destVersion.toString() +'/lib').getFiles().inject('') { acc, val ->  acc + '\ncode = lib/' + val.getName()}}
+${project.fileTree(dir: cfg.destApp.toString() +'/lib').getFiles().inject('') { acc, val ->  acc + '\ncode = lib/' + val.getName()}}
 
 # The main entry point for the application
 class = ${cfg.mainClassName}

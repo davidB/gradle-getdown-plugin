@@ -2,6 +2,8 @@ package bundles
 
 import groovy.text.GStringTemplateEngine
 
+import java.text.SimpleDateFormat
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
@@ -11,6 +13,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
 
@@ -29,16 +32,18 @@ class GetdownPlugin implements Plugin<Project> {
 		project.dependencies {
 			getdown 'com.threerings:getdown:1.4'
 		}
-		def cfg = project.extensions.create("getdown", GetdownPluginExtension)
+		GetdownPluginExtension cfg = project.extensions.create("getdown", GetdownPluginExtension)
 		if (project.getPlugins().findPlugin('application') != null) {
 			project.getLogger().warn("the gradle-getdown-plugin is incompatible with 'application' plugin")
 			throw new IllegalStateException("the gradle-getdown-plugin is incompatible with 'application' plugin")
 		}
-		
+
 		cfg.title = project.name
-		cfg.version = "app"
+		SimpleDateFormat timestampFmt = new SimpleDateFormat("yyyyMMddHHmm")
+		timestampFmt.setTimeZone(TimeZone.getTimeZone("GMT"))
+		cfg.version = Long.parseLong(timestampFmt.format(new Date()))
 		cfg.dest = project.file("${project.buildDir}/getdown")
-		cfg.destVersion = new File(cfg.dest, cfg.version)
+		cfg.destApp = new File(cfg.dest, "app")//new File(cfg.dest, cfg.version)
 		cfg.tmplGetdownTxt = read("bundles/getdown.txt")
 		cfg.tmplScriptUnix = read("bundles/launch")
 		cfg.tmplLaunch4j = read("bundles/launch4j-config.xml")
@@ -54,7 +59,7 @@ class GetdownPlugin implements Plugin<Project> {
 			project.task(type: JavaExec, 'run') {
 				description = "Runs this project as a JVM application"
 				group GROUP
-				workingDir cfg.destVersion
+				workingDir cfg.destApp
 				classpath project.configurations.runtime //project.sourceSets.main.runtimeClasspath
 				jvmArgs cfg.jvmArgs
 				main cfg.mainClassName
@@ -77,6 +82,13 @@ class GetdownPlugin implements Plugin<Project> {
 				dir = cfg.jreCacheDir
 				version = cfg.jreVersion
 			}
+//			project.task('getJres') {
+//				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for all platforms"
+//				group GROUP
+//				dependsOn {
+//					cfg.platforms.collect {platform -> "getJre_${platform.durl}" }
+//				}
+//			}
 			project.task("makeIcons") {
 				description = 'create favicon.ico from shorcut-*.png if favicon.ico is missing'
 				group GROUP
@@ -86,15 +98,15 @@ class GetdownPlugin implements Plugin<Project> {
 						ico.delete()
 						return
 					}
-					def shortcuts = IMG_SHORTCUTS 
+					def shortcuts = IMG_SHORTCUTS
 						.collect{project.file("src/dist/${it}")}
 						.findAll{it != null && it.exists()}
 					if (shortcuts.empty) {
-						shortcuts = IMG_SHORTCUTS_DEFAULT 
+						shortcuts = IMG_SHORTCUTS_DEFAULT
 							.collect{project.file("${cfg.dest}-tmp/all/${it}")}
 						if (!shortcuts.first().exists()) {
 							shortcuts.each{extractToFile("dist/all/${it.getName()}", it)}
-						}	
+						}
 					} else {
 						//TODO remove existing shortcuts on cfg.dest
 					}
@@ -102,28 +114,32 @@ class GetdownPlugin implements Plugin<Project> {
 					Helper4Icon.makeIcoFile(ico, shortcuts, logger)
 				}
 			}
-//			project.task('getJres') {
-//				description = "download + repackage jre(s) into cache dir (${cfg.jreCacheDir}) for all platforms"
-//				group GROUP
-//				dependsOn {
-//					cfg.platforms.collect {platform -> "getJre_${platform.durl}" }
-//				}
-//			}
+			cfg.distSpec = configureDistSpec(project, cfg.version)
+			project.task(type: Copy, "copyDist") {
+				description = "copy src/dist + jres into ${cfg.dest}"
+				group GROUP
+				dependsOn project.assemble
+				with cfg.distSpec
+				into cfg.dest
+			}
+			project.copyDist.mustRunAfter(project.getJres, project.makeIcons)
 			project.task('makeGetdownTxt') {
 				description = 'create the file getdown.txt'
 				group GROUP
 				doLast {
-					def f = new File(cfg.destVersion, "getdown.txt")
+					def f = new File(cfg.destApp, "getdown.txt")
 					def binding = ["project": project, "cfg": cfg, "JreTools": JreTools]
 					def str = engine.createTemplate(cfg.tmplGetdownTxt).make(binding).toString()
+					f.getParentFile().mkdirs()
 					f.write(str)
 				}
 			}
+			project.makeGetdownTxt.mustRunAfter(project.copyDist)
 			project.task(type: JavaExec, 'makeDigest') {
 				description = 'create the file digest.txt from getdown.txt + files'
 				group GROUP
 				dependsOn 'makeGetdownTxt'
-				workingDir cfg.destVersion
+				workingDir cfg.destApp
 				classpath project.configurations.getdown
 				main 'com.threerings.getdown.tools.Digester'
 				args '.'
@@ -151,7 +167,7 @@ class GetdownPlugin implements Plugin<Project> {
 							, 'outfile' : new File(cfg.dest, "launch.exe").getCanonicalPath()
 							, jar : "${cfg.version}/${getdownJar}"
 							, title: cfg.title
-							, icon : new File(cfg.destVersion, "favicon.ico").getCanonicalPath()
+							, icon : new File(cfg.destApp, "favicon.ico").getCanonicalPath()
 						]
 						def str = engine.createTemplate(cfg.tmplLaunch4j).make(binding).toString()
 						def f = project.file("${cfg.dest}-tmp/launch4j-config.xml")
@@ -176,20 +192,16 @@ class GetdownPlugin implements Plugin<Project> {
 				description = "create the launchers for unix and windows"
 				dependsOn project.makeLauncherUnix, project.makeLauncherWindows
 			}
-			cfg.distSpec = configureDistSpec(project, cfg.version)
-			project.task(type: Sync, "copyDist") {
-				description = "copy src/dist + jres into ${cfg.dest}"
-				group GROUP
-				dependsOn project.assemble
-				with cfg.distSpec
-				into cfg.dest
-			}
-			project.copyDist.mustRunAfter(project.getJres, project.makeIcons)
-
 			project.task('assembleApp'){
 				description = "assemble the full app (getdown ready) into ${cfg.dest}"
 				group GROUP
 				dependsOn project.makeIcons, project.copyDist, project.makeGetdownTxt, project.makeDigest, project.makeLaunchers
+				doLast {
+					project.copy {
+						from "${cfg.destApp}/getdown.txt"
+						into "${cfg.dest}/latest-getdown.txt"
+					}
+				}
 			}
 			def taskBundleName = "bundle"
 			def bundlesDir = new File(cfg.dest, "bundles")
@@ -284,7 +296,7 @@ class GetdownPlugin implements Plugin<Project> {
 		def jres = project.tasks['getJres'].jres
 		def distSpec = project.copySpec {}
 		distSpec.with {
-			into(version){
+			into("app"){
 				from(project.file("${project.getdown.dest}-tmp/all")) //${cfg.dest}-tmp
 				from(project.file("src/dist"))
 				from(project.configurations.getdown)
@@ -303,12 +315,12 @@ class GetdownPlugin implements Plugin<Project> {
 	String read(String rsrc) {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
 	}
-	
+
 	def findShortcuts(Project project) {
 		def shortcuts = IMG_SHORTCUTS.findAll{project.file("src/dist/${it}").exists()}
 		(shortcuts.empty) ? IMG_SHORTCUTS_DEFAULT.findAll() : shortcuts
 	}
-	
+
 	void extractToFile(String rsrc, File dest) {
 		dest.getParentFile().mkdirs()
 		dest.withOutputStream{ os->

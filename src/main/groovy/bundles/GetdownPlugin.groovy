@@ -36,6 +36,7 @@ class GetdownPlugin implements Plugin<Project> {
 			throw new IllegalStateException("the gradle-getdown-plugin is incompatible with 'application' plugin")
 		}
 		cfg.initialize(project)
+		// need to have extensions read and customize by end-user
 		project.afterEvaluate {
 			project.task(type: JavaExec, 'run') {
 				description = "Runs this project as a JVM application"

@@ -81,7 +81,7 @@ A sample application can be browse at https://github.com/davidB/jme3_skel
 
 # Configurations
 
-see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groovy)
+see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groovy) for more info about initialization, and uptodate info.
 
 ```
 	/** application title, used for display name (default : project.name)*/
@@ -161,8 +161,16 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 
 	/**
 	* <p>The specification of the contents of the distribution.</p>
-	* <p>
 	* Use this {@link org.gradle.api.file.CopySpec} to include extra files/resource in the application distribution.
+	* <pre>
+	* getdown {
+	*   distSpec.with {
+	*     from("samples") {
+	*       into('app')
+	*     }
+	*   }
+	* }
+	* </pre>
 	*/
 	CopySpec distSpec
 

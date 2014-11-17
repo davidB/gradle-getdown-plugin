@@ -231,7 +231,7 @@ run - Runs this project as a JVM application
 * [JavaFX packaging tools](https://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm) + [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/):  This plugin will ultimately provide gradle build tasks for the JavaFX Deployment tools in the Java 7 JDK. see [tutorial](http://jaxenter.com/tutorial-a-guide-to-the-gradle-javafx-plugin-105730.html). JavaFx Deployement Tool is the most complete but it can't create cross platform bundle (only installer), it create bundle only the current platform :-( .
 * [gradle-macappbundle](https://code.google.com/p/gradle-macappbundle) : A Gradle Plugin to create a Mac OSX .app application based on the project.
 * [Packr](https://github.com/libgdx/packr/) : Packages your JAR, assets and a JVM for distribution on Windows (ZIP), Linux (ZIP) and Mac OS X (.app), adding a native executable file to make it appear like the app is a native app.
-
+* [AppBundler](https://github.com/joshmarinacci/AppBundler) : AppBundler is an Ant task for packaging up desktop Java apps as native executables.
 
 # TODO
 

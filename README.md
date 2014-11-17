@@ -170,6 +170,7 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
       getdown 'com.threerings:getdown:x.y'
   }
   ```
+
 * How to limit the output platform when run `gradle bundles` ?
   ```
   import bundles.Platform
@@ -177,6 +178,7 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
     platforms = [Platform.LINUX_I586, Platform.LINUX_X64, Platform.WINDOWS_I586] //Platform.values()
   }
   ```
+
 * How to add my files into `app` directory without place them into `src/dist` ?
   ```
   getdown {

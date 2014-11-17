@@ -96,15 +96,13 @@ class GetdownPlugin implements Plugin<Project> {
 				}
 			}
 
+			cfg.distSpec = configureDistSpec(project, cfg.distSpec)
 			project.task(type: Copy, "copyDist") {
 				description = "copy src/dist + jres into ${cfg.dest}"
 				group GROUP
 				dependsOn project.assemble
 				with cfg.distSpec
 				into cfg.dest
-				doFirst {
-					cfg.distSpec = configureDistSpec(project, cfg.distSpec)
-				}
 			}
 			project.copyDist.mustRunAfter(project.getJres, project.makeIcons)
 

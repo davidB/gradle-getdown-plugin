@@ -21,8 +21,6 @@ class GetdownPlugin implements Plugin<Project> {
 	static final String PLUGIN_NAME = "getdown"
 	static final String GROUP = "getdown-bundles"
 	static final GStringTemplateEngine engine = new GStringTemplateEngine()
-	static final String[] IMG_SHORTCUTS = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png', 'shortcut-256.png', 'shortcut-16@2x.png', 'shortcut-32@2x.png', 'shortcut-128@2x.png']
-	static final String[] IMG_SHORTCUTS_DEFAULT = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png']
 
 	void apply(Project project) {
 		project.plugins.apply(JavaPlugin)
@@ -37,24 +35,7 @@ class GetdownPlugin implements Plugin<Project> {
 			project.getLogger().warn("the gradle-getdown-plugin is incompatible with 'application' plugin")
 			throw new IllegalStateException("the gradle-getdown-plugin is incompatible with 'application' plugin")
 		}
-
-		cfg.title = project.name
-		SimpleDateFormat timestampFmt = new SimpleDateFormat("yyyyMMddHHmm")
-		timestampFmt.setTimeZone(TimeZone.getTimeZone("GMT"))
-		cfg.version = Long.parseLong(timestampFmt.format(new Date()))
-		cfg.dest = project.file("${project.buildDir}/getdown")
-		cfg.destApp = new File(cfg.dest, "app")//new File(cfg.dest, cfg.version)
-		cfg.tmplGetdownTxt = read("bundles/getdown.txt")
-		cfg.tmplScriptUnix = read("bundles/launch")
-		cfg.tmplLaunch4j = read("bundles/launch4j-config.xml")
-		cfg.tmplScriptWindows = read("bundles/launch.vbs")
-		String v = System.properties['launch4jCmd']
-		if (v != null) {
-			cfg.launch4jCmd = engine.createTemplate(v).make(['System' : System]).toString()
-			//cfg.launch4jCmd = System.properties['launch4jCmd']
-		}
-		cfg.jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
-		cfg.shortcuts = findShortcuts(project)
+		cfg.initialize(project)
 		project.afterEvaluate {
 			project.task(type: JavaExec, 'run') {
 				description = "Runs this project as a JVM application"
@@ -114,15 +95,19 @@ class GetdownPlugin implements Plugin<Project> {
 					}
 				}
 			}
-			cfg.distSpec = configureDistSpec(project, cfg.version)
+
 			project.task(type: Copy, "copyDist") {
 				description = "copy src/dist + jres into ${cfg.dest}"
 				group GROUP
 				dependsOn project.assemble
 				with cfg.distSpec
 				into cfg.dest
+				doFirst {
+					cfg.distSpec = configureDistSpec(project, cfg.distSpec)
+				}
 			}
 			project.copyDist.mustRunAfter(project.getJres, project.makeIcons)
+
 			project.task('makeGetdownTxt') {
 				description = 'create the file getdown.txt'
 				group GROUP
@@ -290,11 +275,10 @@ class GetdownPlugin implements Plugin<Project> {
 
 	}
 
-	CopySpec configureDistSpec(project, version) {
+	CopySpec configureDistSpec(Project project,CopySpec distSpec) {
 		def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
 		//def jres = project.tasks.findAll{it.name.startsWith('getJre_')}.collect{it.jres}.flatten
 		def jres = project.tasks['getJres'].jres
-		def distSpec = project.copySpec {}
 		distSpec.with {
 			into("app"){
 				from(project.file("${project.getdown.dest}-tmp/all")) //${cfg.dest}-tmp
@@ -310,22 +294,5 @@ class GetdownPlugin implements Plugin<Project> {
 			}
 		}
 		distSpec
-	}
-
-	String read(String rsrc) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
-		//return this.getClass().getClassLoader().getResourceAsStream("/" + rsrc).text
-	}
-
-	def findShortcuts(Project project) {
-		def shortcuts = IMG_SHORTCUTS.findAll{project.file("src/dist/${it}").exists()}
-		(shortcuts.empty) ? IMG_SHORTCUTS_DEFAULT.findAll() : shortcuts
-	}
-
-	void extractToFile(String rsrc, File dest) {
-		dest.getParentFile().mkdirs()
-		dest.withOutputStream{ os->
-		  os << Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc)
-		}
 	}
 }

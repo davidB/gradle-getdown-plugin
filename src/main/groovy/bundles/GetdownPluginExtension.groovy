@@ -1,8 +1,15 @@
 package bundles
 
+import groovy.text.GStringTemplateEngine;
+
+import java.text.SimpleDateFormat
+
+import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 
 class GetdownPluginExtension {
+	static final String[] IMG_SHORTCUTS = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png', 'shortcut-256.png', 'shortcut-16@2x.png', 'shortcut-32@2x.png', 'shortcut-128@2x.png']
+	static final String[] IMG_SHORTCUTS_DEFAULT = ['shortcut-16.png', 'shortcut-32.png', 'shortcut-64.png', 'shortcut-128.png']
 
 	/** application title, used for display name (default : project.name)*/
 	String title
@@ -81,8 +88,45 @@ class GetdownPluginExtension {
 
 	/**
 	* <p>The specification of the contents of the distribution.</p>
-	* <p>
 	* Use this {@link org.gradle.api.file.CopySpec} to include extra files/resource in the application distribution.
+	* <pre>
+	* getdown {
+	*   distSpec.with {
+	*     from("samples") {
+	*       into('app')
+	*     }
+	*   }
+	* }
+	* </pre>
 	*/
 	CopySpec distSpec
+
+	def initialize(Project project) {
+		title = project.name
+		SimpleDateFormat timestampFmt = new SimpleDateFormat("yyyyMMddHHmm")
+		timestampFmt.setTimeZone(TimeZone.getTimeZone("GMT"))
+		version = Long.parseLong(timestampFmt.format(new Date()))
+		dest = project.file("${project.buildDir}/getdown")
+		destApp = new File(dest, "app")//new File(cfg.dest, cfg.version)
+		tmplGetdownTxt = Helper4Rsrc.read("bundles/getdown.txt")
+		tmplScriptUnix = Helper4Rsrc.read("bundles/launch")
+		tmplLaunch4j = Helper4Rsrc.read("bundles/launch4j-config.xml")
+		tmplScriptWindows = Helper4Rsrc.read("bundles/launch.vbs")
+		String v = System.properties['launch4jCmd']
+		if (v != null) {
+			GStringTemplateEngine engine = new GStringTemplateEngine()
+			launch4jCmd = engine.createTemplate(v).make(['System' : System]).toString()
+			//cfg.launch4jCmd = System.properties['launch4jCmd']
+		}
+		jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
+		shortcuts = findShortcuts(project)
+		mainClassName = project.hasProperty("mainClassName") ? project.property['mainClassName'] : null
+		distSpec = project.copySpec {}
+	}
+
+	def findShortcuts(Project project) {
+		def shortcuts = IMG_SHORTCUTS.findAll{project.file("src/dist/${it}").exists()}
+		(shortcuts.empty) ? IMG_SHORTCUTS_DEFAULT.findAll() : shortcuts
+	}
+
 }

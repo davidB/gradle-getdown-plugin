@@ -235,13 +235,6 @@ run - Runs this project as a JVM application
 
 * more testing
 * better configuration
-* documentation
-  * layouts : source, website, deployed app,...
-  * how to configure,...
-* create mac OSX bundle (.app)
-* versionned mode support
-* allow to configure what files to remove from jre + from jre/rt.jar like [packr](https://github.com/libgdx/packr)
-* applet mode support ??
-* auto-download + install (in cache) of launch4j like in [launch4j-maven-plugin](https://github.com/lukaszlenart/launch4j-maven-plugin), then user doesn't care if it's launch4j or an other backend-tool used to create .exe for windows.
-* create .ico from png (like [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/), see process in [Automating the creation of multires icons for JavaFX applications](http://teabeeoh.blogspot.fr/2014/02/automating-creation-of-multires-icons.html) ) +may be create every missing resolution from bigger image.
+* better documentation
+* see issue tracker
 

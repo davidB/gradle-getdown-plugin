@@ -21,24 +21,11 @@ apply plugin: 'net.alchim31.getdown'
 
 ...
 
-dependencies {
-    getdown 'com.threerings:getdown:1.4-SNAPSHOT' // optional if you want to override/force the getdown version to used
-}
-
-import bundles.Platform
 getdown {
 	urlbase = "http://mysite.com/myapp/"
 	mainClassName = 'mypackage.Main'
-	jvmArgs = ["-ea"]
-	platforms = [Platform.LINUX_I586, Platform.LINUX_X64, Platform.WINDOWS_I586] //Platform.values()
-	tmplGetdownTxt = tmplGetdownTxt + "\nallow_offline = true"
+	tmplGetdownTxt = tmplGetdownTxt + '\nallow_offline = true'
 }
-```
-
-into sources (src/dist is copied as is, and favicon.ico is required to generate launch.exe)
-```
-src/dist
-└── favicon.ico
 ```
 
 sample output after `gradle clean bundles` :
@@ -48,7 +35,7 @@ build/getdown
 ├── app
 │   ├── digest.txt
 │   ├── favicon.ico
-│   ├── getdown-1.4-SNAPSHOT.jar
+│   ├── getdown-1.4.jar
 │   ├── getdown.txt
 │   └── lib
 |       └── *.jar
@@ -175,6 +162,32 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	CopySpec distSpec
 
 ```
+## Howto
+
+* How to override / force the getdown version to use (default: 1.4)?
+  ```
+  dependencies {
+      getdown 'com.threerings:getdown:x.y'
+  }
+  ```
+* How to limit the output platform when run `gradle bundles` ?
+  ```
+  import bundles.Platform
+  getdown {
+    platforms = [Platform.LINUX_I586, Platform.LINUX_X64, Platform.WINDOWS_I586] //Platform.values()
+  }
+  ```
+* How to add my files into `app` directory without place them into `src/dist` ?
+  ```
+  getdown {
+    distSpec.with {
+      from("samples") {
+        into('app')
+      }
+    }
+  }
+  ```
+
 
 # Tasks
 

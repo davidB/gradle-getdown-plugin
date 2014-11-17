@@ -1,5 +1,5 @@
 A gradle plugin to bundle java app + jre with getdown support.
-The plugin is **incompatible with the 'application plugin'**. 
+The plugin is **incompatible with the 'application plugin'**.
 
 NOTE: *it's my first groovy project and my first gradle plugin, so any advices are welcome*
 
@@ -176,36 +176,39 @@ Every steps can be called via a task, to ease setup/debugging
 $> gradle tasks
 
 ...
-                                                                                                                                                
-Getdown-bundles tasks                                                                                                                           
----------------------                                                                                                                           
-assembleApp - assemble the full app (getdown ready) into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown                               
-bundle_0 - bundle the application into .tgz without jre                                                                                         
-bundle_linux-i586 - bundle the application into .tgz with jre for linux-i586                                                                    
-bundle_linux-x64 - bundle the application into .tgz with jre for linux-x64                                                                      
-bundle_windows-i586 - bundle the application into .zip with jre for windows-i586                                                                
-bundle_windows-x64 - bundle the application into .zip with jre for windows-x64                                                                  
-bundles - generate all bundles                                                                                                                  
-copyDist - copy src/dist + jres into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown                                                   
-getJre_linux-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-i586                            
-getJre_linux-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-x64                              
-getJre_windows-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-i586                        
-getJre_windows-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-x64                          
-getJres - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for all platforms                                            
-makeDigest - create the file digest.txt from getdown.txt + files                                                                                
-makeGetdownTxt - create the file getdown.txt                                                                                                    
-makeLauncherUnix - create the launcher script for unix (linux)                                                                                  
-makeLauncherWindows - create the launcher for windows (create a VBS script)                                                                     
-run - Runs this project as a JVM application                                                                                                    
 
-...                                                                                                                                            
-```                                                                                                              
-* **makeLauncherWindows** if launch4jCmd is defined generate a .exe else a .vbs script (description of task also change when launch4jCmd is defined)  
+Getdown-bundles tasks
+---------------------
+assembleApp - assemble the full app (getdown ready) into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown
+bundle_0 - bundle the application into .tgz without jre
+bundle_linux-i586 - bundle the application into .tgz with jre for linux-i586
+bundle_linux-x64 - bundle the application into .tgz with jre for linux-x64
+bundle_windows-i586 - bundle the application into .zip with jre for windows-i586
+bundle_windows-x64 - bundle the application into .zip with jre for windows-x64
+bundles - generate all bundles
+copyDist - copy src/dist + jres into C:\Users\dwayne\Documents\GitHub\jme3_skel\build\getdown
+getJre_linux-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-i586
+getJre_linux-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform linux-x64
+getJre_windows-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-i586
+getJre_windows-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-x64
+getJres - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for all platforms
+makeDigest - create the file digest.txt from getdown.txt + files
+makeGetdownTxt - create the file getdown.txt
+makeLauncherUnix - create the launcher script for unix (linux)
+makeLauncherWindows - create the launcher for windows (create a VBS script)
+run - Runs this project as a JVM application
+
+...
+```
+* **makeLauncherWindows** if launch4jCmd is defined generate a .exe else a .vbs script (description of task also change when launch4jCmd is defined)
 
 # Alternatives
 
+* [gradle application plugin](http://www.gradle.org/docs/current/userguide/application_plugin.html) : The Gradle application plugin extends the language plugins with common application related tasks. It allows running and bundling applications for the jvm. (but it doesn't include jvm)
 * [JavaFX packaging tools](https://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm) + [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/):  This plugin will ultimately provide gradle build tasks for the JavaFX Deployment tools in the Java 7 JDK. see [tutorial](http://jaxenter.com/tutorial-a-guide-to-the-gradle-javafx-plugin-105730.html). JavaFx Deployement Tool is the most complete but it can't create cross platform bundle (only installer), it create bundle only the current platform :-( .
+* [gradle-macappbundle](https://code.google.com/p/gradle-macappbundle) : A Gradle Plugin to create a Mac OSX .app application based on the project.
 * [Packr](https://github.com/libgdx/packr/) : Packages your JAR, assets and a JVM for distribution on Windows (ZIP), Linux (ZIP) and Mac OS X (.app), adding a native executable file to make it appear like the app is a native app.
+
 
 # TODO
 
@@ -219,5 +222,5 @@ run - Runs this project as a JVM application
 * allow to configure what files to remove from jre + from jre/rt.jar like [packr](https://github.com/libgdx/packr)
 * applet mode support ??
 * auto-download + install (in cache) of launch4j like in [launch4j-maven-plugin](https://github.com/lukaszlenart/launch4j-maven-plugin), then user doesn't care if it's launch4j or an other backend-tool used to create .exe for windows.
-* create .ico from png (like [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/), see process in [Automating the creation of multires icons for JavaFX applications](http://teabeeoh.blogspot.fr/2014/02/automating-creation-of-multires-icons.html) ) +may be create every missing resolution from bigger image. 
+* create .ico from png (like [JavaFX Gradle Plugin](https://bitbucket.org/shemnon/javafx-gradle/), see process in [Automating the creation of multires icons for JavaFX applications](http://teabeeoh.blogspot.fr/2014/02/automating-creation-of-multires-icons.html) ) +may be create every missing resolution from bigger image.
 

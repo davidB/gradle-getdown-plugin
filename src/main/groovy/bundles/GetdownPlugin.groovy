@@ -183,7 +183,8 @@ class GetdownPlugin implements Plugin<Project> {
 				doLast {
 					project.copy {
 						from "${cfg.destApp}/getdown.txt"
-						into "${cfg.dest}/latest-getdown.txt"
+						into "${cfg.dest}"
+						rename("getdown.txt", "latest-getdown.txt")
 					}
 				}
 			}

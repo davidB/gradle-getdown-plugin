@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = "net.alchim31.gradle"
-version = "0.3.2"
+version = "0.4.0"
 def description = 'A gradle plugin to bundle java app + jre with getdown support'
 
 sourceCompatibility = 1.7

@@ -163,5 +163,5 @@ function splitJvmOpts() {
 }
 eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS $LAUNCHER_OPTS
 
-
+mkdir $APP_HOME/app/log
 exec "$JAVACMD" "${JVM_OPTS[@]}" -jar $APP_HOME/app/getdown*.jar $APP_HOME/app "$@"

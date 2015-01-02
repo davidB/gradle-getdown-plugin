@@ -1,5 +1,4 @@
 A gradle plugin to bundle java app + jre with getdown support.
-The plugin is **incompatible with the 'application plugin'**.
 
 NOTE: *it's my first groovy project and my first gradle plugin, so any advices are welcome*
 
@@ -215,11 +214,11 @@ getJre_linux-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.
 getJre_windows-i586 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-i586
 getJre_windows-x64 - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for platform windows-x64
 getJres - download + repackage jre(s) into cache dir (C:\Users\dwayne\.cache\jres) for all platforms
+launch - launch the app for test
 makeDigest - create the file digest.txt from getdown.txt + files
 makeGetdownTxt - create the file getdown.txt
 makeLauncherUnix - create the launcher script for unix (linux)
 makeLauncherWindows - create the launcher for windows (create a VBS script)
-run - Runs this project as a JVM application
 
 ...
 ```

@@ -38,14 +38,6 @@ class GetdownPlugin implements Plugin<Project> {
 		cfg.initialize(project)
 		// need to have extensions read and customize by end-user
 		project.afterEvaluate {
-			project.task(type: JavaExec, 'run') {
-				description = "Runs this project as a JVM application"
-				group GROUP
-				workingDir cfg.destApp
-				classpath project.configurations.runtime //project.sourceSets.main.runtimeClasspath
-				jvmArgs cfg.jvmArgs
-				main cfg.mainClassName
-			}
 			cfg.platforms.collect { platform ->
 				//see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
 				project.task(type: GetJreTask, "getJre_${platform.durl}") {
@@ -264,6 +256,15 @@ class GetdownPlugin implements Plugin<Project> {
 				dependsOn {
 					cfg.platforms.collect {platform -> "${taskBundleName}_${platform.durl}" }
 				}
+			}
+			project.task(type: JavaExec, 'launch') {
+				description = "launch the app for test"
+				group GROUP
+				dependsOn 'bundle_0'
+				workingDir cfg.dest
+				classpath project.configurations.getdown //-jar $APP_HOME/app/getdown*.jar
+				main 'com.threerings.getdown.launcher.GetdownApp'
+				args cfg.destApp
 			}
 		}
 	}

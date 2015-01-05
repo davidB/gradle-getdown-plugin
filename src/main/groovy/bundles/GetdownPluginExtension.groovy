@@ -120,7 +120,8 @@ class GetdownPluginExtension {
 		}
 		jreCacheDir = project.file("${System.properties['user.home']}/.cache/jres")
 		shortcuts = findShortcuts(project)
-		mainClassName = project.hasProperty("mainClassName") ? project.property['mainClassName'] : null
+		mainClassName = project.hasProperty('mainClassName') ? project.property('mainClassName') : null
+		jvmArgs = project.hasProperty('applicationDefaultJvmArgs') ? project.property('applicationDefaultJvmArgs') : []
 		distSpec = project.copySpec {}
 	}
 

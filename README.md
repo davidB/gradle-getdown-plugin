@@ -239,3 +239,7 @@ makeLauncherWindows - create the launcher for windows (create a VBS script)
 * better documentation
 * see issue tracker
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/davidB/gradle-getdown-plugin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+

@@ -7,7 +7,7 @@ class Helper4Rsrc {
 	static String read(String rsrc) {
 		def is = Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc)
 		if (is == null) {
-			is = this.getClass().getClassLoader().getResourceAsStream("/" + rsrc)
+			is = Helper4Rsrc.class.getClassLoader().getResourceAsStream("/" + rsrc)
 		}
 		return is.text
 	}

@@ -5,8 +5,11 @@ import org.gradle.api.Project
 
 class Helper4Rsrc {
 	static String read(String rsrc) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc).text
-		//return this.getClass().getClassLoader().getResourceAsStream("/" + rsrc).text
+		def is = Thread.currentThread().getContextClassLoader().getResourceAsStream(rsrc)
+		if (is == null) {
+			is = this.getClass().getClassLoader().getResourceAsStream("/" + rsrc)
+		}
+		return is.text
 	}
 
 	static void extractToFile(String rsrc, File dest) {

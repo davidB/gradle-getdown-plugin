@@ -22,7 +22,7 @@ public class JreTools {
 	}
 
 	public static URL toOracleDownloadUrl(JreVersion jv, Platform platform) {
-		"http://download.oracle.com/otn-pub/java/jdk/${jv.minor}u${jv.update}-b${jv.build}/jre-${jv.minor}u${jv.update}-${platform.durl}.tar.gz".toURL()
+		"http://download.oracle.com/otn-pub/java/jdk/${jv.minor}u${jv.update}-b${String.format('%02d', jv.build)}/jre-${jv.minor}u${jv.update}-${platform.durl}.tar.gz".toURL()
 	}
 
 	public static def findJreJarName(JreVersion jv, Platform platform) {
@@ -44,7 +44,7 @@ public class JreTools {
 		//URLConnection uc = src.openConnection();
 		def client = new OkHttpClient();
 		def request = new Request.Builder().url(src)
-			.addHeader("Cookie", "gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie")
+			.addHeader("Cookie", "oraclelicense=accept-securebackup-cookie")
 			//.addHeader("Content-Type", "application/")
 			.build()
 		def response = client.newCall(request).execute()

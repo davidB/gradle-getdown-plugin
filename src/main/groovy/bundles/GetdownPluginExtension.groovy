@@ -60,13 +60,16 @@ class GetdownPluginExtension {
 	/** The template used to generate the launch4j configuration */
 	String tmplLaunch4j
 
-	/** jre version to deploy, also used by default getdown.txt template to define the jvm min version */
-	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)
+	/**
+	* jre version to deploy, also used by default getdown.txt template to define the jvm min version (default: current running java version))
+	* type: String (eg. '1.8.0_u20-b26') or a bundles.JreVersion (eg. new bundles.JreVersion(1,8,0,20,26) )
+	*/
+	Object jreVersion
 
 	/** the list of platform for jres and native bundles to provide */
 	Platform[] platforms = Platform.values()
 
-	/** the directory where to cache downloaded + packaged jre (default $HOME/.cache */
+	/** the directory where to cache downloaded + packaged jre (default $HOME/.cache) */
 	File jreCacheDir
 
 
@@ -123,6 +126,15 @@ class GetdownPluginExtension {
 		mainClassName = project.hasProperty('mainClassName') ? project.property('mainClassName') : null
 		jvmArgs = project.hasProperty('applicationDefaultJvmArgs') ? project.property('applicationDefaultJvmArgs') : []
 		distSpec = project.copySpec {}
+	}
+
+	def afterEvaluate(Project project) {
+		if (jreVersion == null) {
+			jreVersion = JreTools.current()
+		}
+		if (jreVersion instanceof String) {
+			jreVersion = JreTools.versionFromString(jreVersion)
+		}
 	}
 
 	def findShortcuts(Project project) {

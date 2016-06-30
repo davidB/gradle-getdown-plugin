@@ -119,8 +119,12 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 	/** The template used to generate the launch4j configuration */
 	String tmplLaunch4j
 
-	/** jre version to deploy, also used by default getdown.txt template to define the jvm min version */
-	JreVersion jreVersion = JreTools.current() //new JreVersion(1,8,0,20,26)
+	/**
+	* jre version to deploy, also used by default getdown.txt template to define the jvm min version (default: current running java version))
+	* type: String (eg. '1.8.0_u20-b26') or a bundles.JreVersion (eg. new bundles.JreVersion(1,8,0,20,26) )
+	*/
+	Object jreVersion
+
 
 	/** the list of platform for jres and native bundles to provide */
 	Platform[] platforms = Platform.values()
@@ -242,4 +246,3 @@ makeLauncherWindows - create the launcher for windows (create a VBS script)
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/davidB/gradle-getdown-plugin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

@@ -34,6 +34,8 @@ class GetdownPlugin implements Plugin<Project> {
 		cfg.initialize(project)
 		// need to have extensions read and customize by end-user
 		project.afterEvaluate {
+			cfg.afterEvaluate(project)
+
 			cfg.platforms.collect { platform ->
 				//see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
 				project.task(type: GetJreTask, "getJre_${platform.durl}") {

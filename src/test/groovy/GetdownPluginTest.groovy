@@ -8,6 +8,7 @@ class GetdownPluginTest {
 	public void testIfTaskAreDefined() {
 		Project project = ProjectBuilder.builder().build()
 		project.apply plugin: 'net.alchim31.getdown'
+		//project.getdown.jreVersion = '1.7.0-b147'
 		project.evaluate()
 		assertNotNull(project.tasks.getJres)
 		assertNotNull(project.tasks.makeIcons)

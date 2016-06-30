@@ -9,22 +9,47 @@ import java.net.Proxy;
 public class JreTools {
 	public static JreVersion current() {
 		//<jdk_major_version>.<jdk_minor_version>.<jdk_micro_version>[_<jdk_update_version>][-<milestone>]-<build_number>
-		def m = System.properties['java.runtime.version'] =~ /(\d+)\.(\d+)\.(\d+)_(\d+)\-b(\d+)/
-		new JreVersion(
-			Integer.parseInt(m[0][1], 10)
-			,Integer.parseInt(m[0][2], 10)
-			,Integer.parseInt(m[0][3], 10)
-			,Integer.parseInt(m[0][4], 10)
-			,Integer.parseInt(m[0][5], 10)
-		)
+		versionFromString(System.properties['java.runtime.version'])
 	}
+
+	public static JreVersion versionFromString(String s) {
+			//<jdk_major_version>.<jdk_minor_version>.<jdk_micro_version>[_<jdk_update_version>][-<milestone>]-<build_number>
+			def m = s =~ /(\d+)\.(\d+)\.(\d+)_(\d+)\-b(\d+)/
+			if (m.matches()) {
+				new JreVersion(
+					Integer.parseInt(m[0][1], 10)
+					,Integer.parseInt(m[0][2], 10)
+					,Integer.parseInt(m[0][3], 10)
+					,Integer.parseInt(m[0][4], 10)
+					,Integer.parseInt(m[0][5], 10)
+				)
+			} else {
+				// eg. the default pattern failed for 1.7.0-b147 (the first java 1.7 release)
+				m = s =~ /(\d+)\.(\d+)\.(\d+)\-b(\d+)/
+				if (m.matches()) {
+					new JreVersion(
+						Integer.parseInt(m[0][1], 10)
+						,Integer.parseInt(m[0][2], 10)
+						,Integer.parseInt(m[0][3], 10)
+						,0
+						,Integer.parseInt(m[0][4], 10)
+					)
+				} else {
+					throw new Exception("Can't parse java version: " + s)
+				}
+			}
+		}
 
 	public static int toGetdownFormat(JreVersion jv) {
 		jv.update + 100 * (jv.micro + 100 * (jv.minor + 100 * jv.major))
 	}
 
 	public static URL toOracleDownloadUrl(JreVersion jv, Platform platform) {
-		"http://download.oracle.com/otn-pub/java/jdk/${jv.minor}u${jv.update}-b${String.format('%02d', jv.build)}/jre-${jv.minor}u${jv.update}-${platform.durl}.tar.gz".toURL()
+		if (jv.update == 0) {
+			"http://download.oracle.com/otn-pub/java/jdk/${jv.minor}-b${String.format('%02d', jv.build)}/jre-${jv.minor}-${platform.durl}.tar.gz".toURL()
+		} else {
+			"http://download.oracle.com/otn-pub/java/jdk/${jv.minor}u${jv.update}-b${String.format('%02d', jv.build)}/jre-${jv.minor}u${jv.update}-${platform.durl}.tar.gz".toURL()
+		}
 	}
 
 	public static def findJreJarName(JreVersion jv, Platform platform) {

@@ -56,6 +56,11 @@ class GetdownPluginExtension {
 	 *  </pre>
 	 */
 	String launch4jCmd
+	
+	/**
+	 * The name of the Windows .exe launcher e.g. "myApp.exe"
+	 */
+	String winLauncherName = "launch.exe"
 
 	/** The template used to generate the launch4j configuration */
 	String tmplLaunch4j

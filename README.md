@@ -4,9 +4,9 @@ NOTE: *it's my first groovy project and my first gradle plugin, so any advices a
 
 # Sample Project
 
-into build.gradle
+into `build.gradle`
 
-```
+```gradle
 buildscript {
   repositories {
     jcenter()
@@ -29,7 +29,7 @@ getdown {
 
 sample output after `gradle clean bundles` :
 
-```
+```shell
 build/getdown
 ├── app
 │   ├── digest.txt
@@ -69,7 +69,7 @@ A sample application can be browse at https://github.com/davidB/jme3_skel
 
 see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groovy) for more info about initialization, and uptodate info.
 
-```
+```groovy
 	/** application title, used for display name (default : project.name)*/
 	String title
 
@@ -168,14 +168,14 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 ## Howto
 
 * How to override / force the getdown version to use (default: 1.4)?
-  ```
+  ```gradle
   dependencies {
       getdown 'com.threerings:getdown:x.y'
   }
   ```
 
 * How to limit the output platform when run `gradle bundles` ?
-  ```
+  ```gradle
   import bundles.Platform
   getdown {
     platforms = [Platform.LINUX_I586, Platform.LINUX_X64, Platform.WINDOWS_I586] //Platform.values()
@@ -183,7 +183,7 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
   ```
 
 * How to add my files into `app` directory without place them into `src/dist` ?
-  ```
+  ```gradle
   getdown {
     distSpec.with {
       from("samples") {
@@ -198,7 +198,7 @@ see [GetdownPluginExtension](src/main/groovy/bundles/GetdownPluginExtension.groo
 
 Every steps can be called via a task, to ease setup/debugging
 
-````
+```shell
 $> gradle tasks
 
 ...

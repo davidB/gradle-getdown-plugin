@@ -138,7 +138,7 @@ class GetdownPlugin implements Plugin<Project> {
 					doFirst {
 						def getdownJar = project.configurations.getdown.resolve().iterator().next().getName()
 						def binding = ["project": project, "cfg": cfg
-							, 'outfile' : new File(cfg.dest, "launch.exe").getCanonicalPath()
+							, 'outfile' : new File(cfg.dest, cfg.winLauncherName).getCanonicalPath()
 							, jar : "app/${getdownJar}"
 							, title: cfg.title
 							, icon : new File(cfg.destApp, "favicon.ico").getCanonicalPath()
